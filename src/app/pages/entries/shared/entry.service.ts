@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { map, catchError, flatMap } from 'rxjs/operators';
 import { EntryModel } from './entry.model';
+import { EntriesModule } from '../entries.module';
 
 
 @Injectable({
@@ -15,14 +16,14 @@ export class EntryService {
 
   constructor(private http: HttpClient) { }
 
-  getAll(): Observable<EntryModel[]>{
+  getAll(): Observable<EntryModel[]> {
     return this.http.get(this.apiPath).pipe(
       catchError(this.handleError),
       map(this.jsonDataToEntries)
     )
   }
 
-  getById(id: number): Observable<EntryModel>{
+  getById(id: number): Observable<EntryModel> {
     const url = `${this.apiPath}/${id}`;
     return this.http.get(url).pipe(
       catchError(this.handleError),
@@ -30,14 +31,14 @@ export class EntryService {
     )
   }
 
-  create(entry: EntryModel): Observable<EntryModel>{
+  create(entry: EntryModel): Observable<EntryModel> {
     return this.http.post(this.apiPath, entry).pipe(
       catchError(this.handleError),
       map(this.jsonDataToEntry)
     )
   }
 
-  update(entry: EntryModel): Observable<EntryModel>{
+  update(entry: EntryModel): Observable<EntryModel> {
     const url = `${this.apiPath}/${entry.id}`;
     return this.http.put(url, entry).pipe(
       catchError(this.handleError),
@@ -45,7 +46,7 @@ export class EntryService {
     )
   }
 
-  delete(id: number): Observable<any>{
+  delete(id: number): Observable<any> {
     const url = `${this.apiPath}/${id}`;
     return this.http.delete(url).pipe(
       catchError(this.handleError),
@@ -55,17 +56,22 @@ export class EntryService {
 
 
   //PRIVATE METHODS
-  private jsonDataToEntries(jsonData: any[]): EntryModel[]{
+  private jsonDataToEntries(jsonData: any[]): EntryModel[] {
     const entries: EntryModel[] = [];
-    jsonData.forEach(element => entries.push(element as EntryModel));
+
+    jsonData.forEach(element => {
+      const entry = Object.assign(new EntryModel(), element);
+      entries.push(entry);
+    });
     return entries;
   }
 
-  private jsonDataToEntry(jsonData: any): EntryModel{
-    return jsonData as EntryModel;
+
+  private jsonDataToEntry(jsonData: any): EntryModel {
+    return Object.assign(new EntryModel(), jsonData);
   }
 
-  private handleError(error: any): Observable<any>{
+  private handleError(error: any): Observable<any> {
     console.log("erro na requisição =>", error);
     return throwError(error);
   }
