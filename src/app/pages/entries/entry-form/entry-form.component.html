@@ -48,48 +48,64 @@
                 </div>
               </div>
 
-                   <!-- Amount -->
+              <!-- Amount -->
               <div class="form-group col-md-3">
                 <label for="amount">Valor</label>
                 <div class="input-group">
                   <div class="input-group-prepend">
                     <div class="input-group-text"> R$</div>
                   </div>
-                  <input [imask]="imaskConfig" type="text" class="form-control text-right" id="amount" formControlName="amount">
+                  <input [imask]="imaskConfig" type="text" class="form-control text-right" id="amount"
+                    formControlName="amount">
                 </div>
-              <div class="text-danger" *ngIf="entryForm.get('amount').invalid && entryForm.get('amount').touched">
+                <div class="text-danger" *ngIf="entryForm.get('amount').invalid && entryForm.get('amount').touched">
                   <div *ngIf="entryForm.get('amount').errors.required">dado obrigatório</div>
                 </div>
-
-
               </div>
 
+                <!-- Date -->
+                <div class="form-group col-md-2">
+                  <label for="date">Data</label>
+                  <p-calendar id="date" formControlName="date" 
+                  inputStyleClass="form-control" dataType="string"
+                    dateFormat="dd/mm/yy">
+
+                  </p-calendar>
+                
+
+                  <!-- <div class="text-danger" *ngIf="entryForm.get('date').invalid && entryForm.get('date').touched">
+                    <div *ngIf="entryForm.get('date').errors.required">dado obrigatório</div>
+                  </div> -->
 
 
-              <div class="form-row">
+                </div>
 
-              </div>
 
-              <!-- Description -->
-              <div class="form-group col-md-8">
-                <label for="description">Descrição</label>
-                <input type="text" class="form-control" id="description" formControlName="description">
+
+                <div class="form-row">
+
+                </div>
+
+                <!-- Description -->
+                <div class="form-group col-md-8">
+                  <label for="description">Descrição</label>
+                  <input type="text" class="form-control" id="description" formControlName="description">
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
 
-        <div class="alert alert-danger mt-4" *ngIf="serverErrorMessages">
-          <strong>Erro no servidor:</strong>
-          <ul>
-            <li *ngFor="let error of serverErrorMessages">{{error}}</li>
-          </ul>
-        </div>
+          <div class="alert alert-danger mt-4" *ngIf="serverErrorMessages">
+            <strong>Erro no servidor:</strong>
+            <ul>
+              <li *ngFor="let error of serverErrorMessages">{{error}}</li>
+            </ul>
+          </div>
 
-        <button [disabled]="submittingForm || entryForm.invalid" type="submit"
-          class="btn btn-primary btn-lg float-right mt-3">
-          Salvar
-        </button>
+          <button [disabled]="submittingForm || entryForm.invalid" type="submit"
+            class="btn btn-primary btn-lg float-right mt-3">
+            Salvar
+          </button>
 
-        </form>
+          </form>
