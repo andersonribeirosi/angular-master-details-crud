@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { switchMap } from "rxjs/operators";
 import { EntryModel } from '../shared/entry.model';
 import { EntryService } from '../shared/entry.service';
+import { CategoryModel } from '../../categories/shared/category.model';
+import { CategoryService } from '../../categories/shared/category.service';
 
 
 @Component({
@@ -21,6 +23,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
   serverErrorMessages: string[] = null;
   submittingForm: boolean = false;
   entry: EntryModel = new EntryModel();
+  categories: Array<CategoryModel>;
 
   imaskConfig = {
     mask: Number,
@@ -36,13 +39,15 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
     private entryService: EntryService,
     private route: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private categoryService: CategoryService
   ) { }
 
   ngOnInit() {
     this.setCurrentAction();
     this.buildEntryForm();
     this.loadEntry();
+    this.loadCategory();
   }
 
   ngAfterContentChecked(){
@@ -56,6 +61,17 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
       this.createEntry();
     else // currentAction == "edit"
       this.updateEntry();
+  }
+
+  get typeOptions(): Array<any>{
+    return Object.entries(EntryModel.types).map(
+      ([value, text]) => {
+        return {
+          text: text,
+          value: value
+        }
+      }
+    )
   }
 
 
@@ -95,6 +111,12 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
         (error) => alert('Ocorreu um erro no servidor, tente mais tarde.')
       )
     }
+  }
+
+  private loadCategory(){
+    this.categoryService.getAll().subscribe(
+      categories => this.categories = categories
+    );
   }
 
 
