@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { switchMap } from "rxjs/operators";
 import { CategoryModel } from '../shared/category.model';
 import { CategoryService } from '../shared/category.service';
+import toastr from "toastr";
+
 
 
 @Component({
@@ -101,6 +103,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked{
         category => this.actionsForSuccess(category),
         error => this.actionsForError(error)
       )
+      this.categoryForm.reset();
   }
 
 
@@ -116,17 +119,18 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked{
 
   
   private actionsForSuccess(category: CategoryModel){
-    // toastr.success("Solicitação processada com sucesso!");
+    toastr.success("Solicitação processada com sucesso!");
 
     // redirect/reload component page
     this.router.navigateByUrl("categories", {skipLocationChange: true}).then(
-      () => this.router.navigate(["categories", category.id, "edit"])
+      () => this.router.navigateByUrl('categories')
+      // () => this.router.navigate(["categories", category.id, "edit"])
     )
   }
 
 
   private actionsForError(error){
-    // toastr.error("Ocorreu um erro ao processar a sua solicitação!");
+    toastr.error("Ocorreu um erro ao processar a sua solicitação!");
 
     this.submittingForm = false;
 
