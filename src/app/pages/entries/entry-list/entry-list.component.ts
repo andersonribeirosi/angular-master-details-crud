@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { EntryService } from '../shared/entry.service';
 import { EntryModel } from '../shared/entry.model';
 import { element } from '@angular/core/src/render3';
+import { appInitializerFactory } from '@angular/platform-browser/src/browser/server-transition';
 
 @Component({
   selector: 'app-entry-list',
@@ -15,7 +16,7 @@ export class EntryListComponent implements OnInit {
 
   ngOnInit() {
     this.entryService.getAll().subscribe(
-      entries => this.entries = entries,
+      entries => this.entries = entries.sort((a,b) => b.id - a.id),
       error => alert('Lista retornada com sucesso')
     )
   }
