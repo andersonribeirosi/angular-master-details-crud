@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterContentChecked } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
+import toastr from "toastr";
 
 
 import { switchMap } from "rxjs/operators";
@@ -153,7 +154,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
 
   
   private actionsForSuccess(entry: EntryModel){
-    // toastr.success("Solicitação processada com sucesso!");
+    toastr.success("Solicitação processada com sucesso!");
 
     // redirect/reload component page
     this.router.navigateByUrl("entries", {skipLocationChange: true}).then(
