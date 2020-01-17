@@ -4,7 +4,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { map, catchError, flatMap } from 'rxjs/operators';
 import { EntryModel } from './entry.model';
-import { EntriesModule } from '../entries.module';
 import { CategoryService } from '../../categories/shared/category.service';
 
 
