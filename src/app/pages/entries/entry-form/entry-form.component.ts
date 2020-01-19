@@ -132,7 +132,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
 
 
   private createEntry(){
-    const entry: EntryModel = Object.assign(new EntryModel(), this.entryForm.value);
+    const entry: EntryModel = EntryModel.fromJson(this.entryForm.value);
 
     this.entryService.create(entry)
       .subscribe(
@@ -143,7 +143,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
 
 
   private updateEntry(){
-    const entry: EntryModel = Object.assign(new EntryModel(), this.entryForm.value);
+    const entry: EntryModel = EntryModel.fromJson(this.entryForm.value);
 
     this.entryService.update(entry)
       .subscribe(
@@ -164,7 +164,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
 
 
   private actionsForError(error){
-    // toastr.error("Ocorreu um erro ao processar a sua solicitação!");
+    toastr.error("Ocorreu um erro ao processar a sua solicitação!");
 
     this.submittingForm = false;
 
