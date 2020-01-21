@@ -1,14 +1,13 @@
-import { Component, OnInit, AfterContentChecked } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
-import toastr from "toastr";
+import { Component, OnInit, Injector } from '@angular/core';
+import { Validators } from "@angular/forms";
 
 
-import { switchMap } from "rxjs/operators";
 import { EntryModel } from '../shared/entry.model';
 import { EntryService } from '../shared/entry.service';
+
 import { CategoryModel } from '../../categories/shared/category.model';
 import { CategoryService } from '../../categories/shared/category.service';
+import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form-component';
 
 
 @Component({
@@ -16,14 +15,8 @@ import { CategoryService } from '../../categories/shared/category.service';
   templateUrl: './entry-form.component.html',
   styleUrls: ['./entry-form.component.css']
 })
-export class EntryFormComponent implements OnInit, AfterContentChecked{
-  
-  currentAction: string;
-  entryForm: FormGroup;
-  pageTitle: string;
-  serverErrorMessages: string[] = null;
-  submittingForm: boolean = false;
-  entry: EntryModel = new EntryModel();
+export class EntryFormComponent extends BaseResourceFormComponent<EntryModel> implements OnInit {
+
   categories: Array<CategoryModel>;
 
   imaskConfig = {
@@ -37,34 +30,19 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
 
 
   constructor(
-    private entryService: EntryService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private formBuilder: FormBuilder,
-    private categoryService: CategoryService
-  ) { }
+    protected entryService: EntryService,
+    protected categoryService: CategoryService,
+    protected injector: Injector
+  ) {
+    super(injector, new EntryModel(), entryService, EntryModel.fromJson);
+  }
 
   ngOnInit() {
-    this.setCurrentAction();
-    this.buildEntryForm();
-    this.loadEntry();
     this.loadCategory();
+    super.ngOnInit();
   }
 
-  ngAfterContentChecked(){
-    this.setPageTitle();
-  }
-
-  submitForm(){
-    this.submittingForm = true;
-
-    if(this.currentAction == "new")
-      this.createEntry();
-    else // currentAction == "edit"
-      this.updateEntry();
-  }
-
-  get typeOptions(): Array<any>{
+  get typeOptions(): Array<any> {
     return Object.entries(EntryModel.types).map(
       ([value, text]) => {
         return {
@@ -75,18 +53,8 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
     )
   }
 
-
-  // PRIVATE METHODS
-
-  private setCurrentAction() {
-    if(this.route.snapshot.url[0].path == "new")
-      this.currentAction = "new"
-    else
-      this.currentAction = "edit"
-  }
-
-  private buildEntryForm() {
-    this.entryForm = this.formBuilder.group({
+  protected buildResourceForm() {
+    this.resourceForm = this.formBuilder.group({
       id: [null],
       name: [null, [Validators.required, Validators.minLength(2)]],
       description: [null],
@@ -98,79 +66,19 @@ export class EntryFormComponent implements OnInit, AfterContentChecked{
     });
   }
 
-  private loadEntry() {
-    if (this.currentAction == "edit") {
-      
-      this.route.paramMap.pipe(
-        switchMap(params => this.entryService.getById(+params.get("id")))
-      )
-      .subscribe(
-        (entry) => {
-          this.entry = entry;
-          this.entryForm.patchValue(entry) // binds loaded entry data to EntryForm
-        },
-        (error) => alert('Ocorreu um erro no servidor, tente mais tarde.')
-      )
-    }
-  }
-
-  private loadCategory(){
+  private loadCategory() {
     this.categoryService.getAll().subscribe(
       categories => this.categories = categories
     );
   }
 
-
-  private setPageTitle() {
-    if (this.currentAction == 'new')
-      this.pageTitle = "Cadastro de Novo Lançamento"
-    else{
-      const entryName = this.entry.name || ""
-      this.pageTitle = "Editando Lançamento: " + entryName;
-    }
+  protected creationPageTitle(): string{
+    return "Cadastro de um novo Lançamento"
   }
 
-
-  private createEntry(){
-    const entry: EntryModel = EntryModel.fromJson(this.entryForm.value);
-
-    this.entryService.create(entry)
-      .subscribe(
-        entry => this.actionsForSuccess(entry),
-        error => this.actionsForError(error)
-      )
+  protected editionPageTitle(): string{
+    const entryName = this.resource.name || "";
+    return "Editando Lançamento: " + entryName;
   }
 
-
-  private updateEntry(){
-    const entry: EntryModel = EntryModel.fromJson(this.entryForm.value);
-
-    this.entryService.update(entry)
-      .subscribe(
-        entry => this.actionsForSuccess(entry),
-        error => this.actionsForError(error)
-      )
-  }
-
-  
-  private actionsForSuccess(entry: EntryModel){
-    toastr.success("Solicitação processada com sucesso!");
-
-    // redirect/reload component page
-    this.router.navigateByUrl("entries", {skipLocationChange: true}).then(
-      () => this.router.navigate(["entries", entry.id, "edit"])
-    )
-  }
-
-
-  private actionsForError(error){
-    toastr.error("Ocorreu um erro ao processar a sua solicitação!");
-
-    this.submittingForm = false;
-
-    if(error.status === 422)
-      this.serverErrorMessages = JSON.parse(error._body).errors;
-    else
-      this.serverErrorMessages = ["Falha na comunicação com o servidor. Por favor, tente mais tarde."]
-  }
 }
