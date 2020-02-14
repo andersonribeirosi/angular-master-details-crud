@@ -73,12 +73,12 @@ export class EntryFormComponent extends BaseResourceFormComponent<EntryModel> im
   }
 
   protected creationPageTitle(): string{
-    return "Cadastro de um novo Lançamento"
+    return "Cadastro de um novo Cliente"
   }
 
   protected editionPageTitle(): string{
     const entryName = this.resource.name || "";
-    return "Editando Lançamento: " + entryName;
+    return "Editando Atendimento do Cliente: " + entryName;
   }
 
 }
